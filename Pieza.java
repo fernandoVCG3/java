@@ -1,5 +1,5 @@
-
-public abstract class Pieza {
+import java.util.ArrayList;
+public abstract class Pieza implements Movimientos {
     private String nombrePieza;
     private String colorPieza;
     private int pocision;
@@ -119,6 +119,47 @@ public abstract class Pieza {
         this.fila=fil1(name.substring(1,2));
         this.columna=col1(name.substring(0,1));
     }
+    //clase abstracta
     public abstract String obtenerPosicion();
+    //verifica sie el movimiento es valido
+    protected boolean esMovimientoValido(int fila, int columna, ArrayList<Pieza> piezas) {
+        return esMovimientoValido(fila, columna, piezas, false);
+    }
+
+    protected boolean esMovimientoValido(int fila, int columna, ArrayList<Pieza> piezas, boolean captura) {
+        if (fila < 0 || fila >= 8 || columna < 0 || columna >= 8) {
+            return false;
+        }
+
+        for (Pieza pieza : piezas) {
+            if (pieza.getFila() == fila && pieza.getColumna() == columna) {
+                return captura && !pieza.getColorPieza().equals(this.getColorPieza());
+            }
+        }
+
+        return true;
+    }
+
+    protected void imprimirMovimiento(int fila, int columna) {
+        char columnaLetra = (char) ('a' + columna);
+        int filaNumero = 8 - fila;
+        System.out.println("" + columnaLetra + filaNumero);
+    }
+
+    protected void moverEnDireccion(ArrayList<Pieza> piezas, int dFila, int dColumna) {
+        int fila = this.getFila();
+        int columna = this.getColumna();
+
+        while (true) {
+            fila += dFila;
+            columna += dColumna;
+
+            if (!esMovimientoValido(fila, columna, piezas)) {
+                break;
+            }
+
+            imprimirMovimiento(fila, columna);
+        }
+    }
 
 }

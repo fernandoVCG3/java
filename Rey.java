@@ -1,4 +1,6 @@
-public class Rey extends Pieza{
+import java.util.ArrayList;
+
+public class Rey extends Pieza implements Movimientos{
 
     public Rey(String nombrePieza, String colorPieza, int pocision) {
         super(nombrePieza, colorPieza, pocision);
@@ -60,5 +62,59 @@ public class Rey extends Pieza{
         }
         String nota= ax2+a;
         return nota;
+    }
+
+    @Override
+    public void mostrarPosiblesMovimientos(ArrayList<Pieza> piezas) {
+        int[][] movimientos = {
+                {1, 0}, {-1, 0}, {0, 1}, {0, -1}, // Arriba, abajo, derecha, izquierda
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1} // Diagonales
+        };
+
+        System.out.println("Movimientos posibles del Rey:");
+
+        for (int[] mov : movimientos) {
+            int nuevaFila = this.getFila() + mov[0];
+            int nuevaColumna = this.getColumna() + mov[1];
+
+            // Verificamos que esté dentro del tablero
+            if (nuevaFila >= 0 && nuevaFila < 8 && nuevaColumna >= 0 && nuevaColumna < 8) {
+                boolean ocupado = false;
+                boolean enemigo = false;
+
+                // Recorremos todas las piezas para ver si alguna está en la nueva posición
+                for (Pieza pieza : piezas) {
+                    if (pieza.getFila() == nuevaFila && pieza.getColumna() == nuevaColumna) {
+                        ocupado = true;
+                        if (!pieza.getColorPieza().equals(this.getColorPieza())) { // Si es de otro color
+                            enemigo = true;
+                        }
+                        break;
+                    }
+                }
+
+                // Si la casilla está vacía o tiene un enemigo, el Rey puede moverse
+                if (!ocupado || enemigo) {
+                    char columnaLetra = (char) ('a' + nuevaColumna);
+                    int filaNumero = 8 - nuevaFila;
+                    System.out.println("" + columnaLetra + filaNumero);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean jaque(ArrayList<Pieza> piezas) {
+        for (Pieza pieza : piezas) {
+            if (pieza instanceof Rey && !pieza.getColorPieza().equals(this.getColorPieza())) {
+                int difFila = Math.abs(this.getFila() - pieza.getFila());
+                int difColumna = Math.abs(this.getColumna() - pieza.getColumna());
+
+                if (difFila <= 1 && difColumna <= 1) {
+                    return true;  // El rey puede capturar al otro rey
+                }
+            }
+        }
+        return false;
     }
 }
